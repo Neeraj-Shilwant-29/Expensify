@@ -1,0 +1,47 @@
+<div class="dashboard-container">
+  <nav class="dashboard-nav">
+    <div class="nav-header">
+      <h1>SpendX</h1>
+    </div>
+    <ul class="nav-links">
+      <li [class.active]="activeSection === 'summary'" (click)="switchSection('summary')">
+        <i class="fas fa-chart-pie"></i>
+        <span>Summary</span>
+      </li>
+      <li [class.active]="activeSection === 'expenses'" (click)="switchSection('expenses')">
+        <i class="fas fa-receipt"></i>
+        <span>Expenses</span>
+      </li>
+      <li [class.active]="activeSection === 'income'" (click)="switchSection('income')">
+        <i class="fas fa-money-bill-wave"></i>
+        <span>Income</span>
+      </li>
+      <li [class.active]="activeSection === 'investments'" (click)="switchSection('investments')">
+        <i class="fas fa-chart-line"></i>
+        <span>Investments</span>
+      </li>
+      <li [class.active]="activeSection === 'subscriptions'" (click)="switchSection('subscriptions')">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Subscriptions</span>
+      </li>
+      <li [class.active]="activeSection === 'settings'" (click)="switchSection('settings')">
+        <i class="fas fa-cog"></i>
+        <span>Settings</span>
+      </li>
+    </ul>
+  </nav>
+
+  <main class="dashboard-content">
+    <div class="content-header">
+      <h2>{{ activeSection | titlecase }}</h2>
+    </div>
+    <div class="content-body">
+      <app-summary *ngIf="activeSection === 'summary'"></app-summary>
+      <app-expenses *ngIf="activeSection === 'expenses'"></app-expenses>
+      <app-income *ngIf="activeSection === 'income'"></app-income>
+      <app-investments *ngIf="activeSection === 'investments'"></app-investments>
+      <app-subscriptions *ngIf="activeSection === 'subscriptions'"></app-subscriptions>
+      <app-settings *ngIf="activeSection === 'settings'"></app-settings>
+    </div>
+  </main>
+</div>

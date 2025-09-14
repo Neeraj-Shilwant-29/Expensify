@@ -1,0 +1,57 @@
+<div class="summary-container">
+  <div class="summary-cards">
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-money-bill-wave"></i>
+        <h3>Total Income</h3>
+      </div>
+      <div class="card-value">₹ {{ summaryData.totalIncome | number }}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-wallet"></i>
+        <h3>Available Balance</h3>
+      </div>
+      <div class="card-value">₹ {{ summaryData.availableBalance | number }}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-receipt"></i>
+        <h3>Total Spent</h3>
+      </div>
+      <div class="card-value">₹ {{ summaryData.totalSpent | number }}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-chart-line"></i>
+        <h3>Total Investment</h3>
+      </div>
+      <div class="card-value">₹ {{ summaryData.totalInvestment | number }}</div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <i class="fas fa-calendar-alt"></i>
+        <h3>Total Subscriptions</h3>
+      </div>
+      <div class="card-value">₹ {{ summaryData.totalSubscriptions | number }}</div>
+    </div>
+  </div>
+  <div class="summary-chart-container">
+    <div class="summary-chart" style="width: 50%;">
+      <h3>Budget</h3>
+      <div class="chart-container">
+        <canvas #pieChart></canvas>
+      </div>
+    </div>
+    <div class="summary-chart" style="width: 50%;">
+      <h3>Subscription</h3>
+      <div class="chart-container">
+        <canvas #pieChart2></canvas>
+      </div>
+    </div>
+  </div>
+</div>
