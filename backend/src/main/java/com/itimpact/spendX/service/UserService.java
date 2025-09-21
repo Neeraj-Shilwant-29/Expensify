@@ -29,7 +29,7 @@ public class UserService {
 
     public User updateUser(Long id, User userDetails) {
         return repo.findById(id).map(user -> {
-            user.setName(userDetails.getName());
+            user.setUsername(userDetails.getUsername());
             user.setEmail(userDetails.getEmail());
             return repo.save(user);
         }).orElseThrow(() -> new RuntimeException("User not found"));

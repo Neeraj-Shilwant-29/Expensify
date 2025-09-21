@@ -56,7 +56,7 @@
   <!-- Income Table -->
   <div class="table-container">
     <ag-grid-angular
-      class="ag-theme-alpine"
+      [ngClass]="'ag-theme-alpine'"
       [rowData]="rowData"
       [columnDefs]="columnDefs"
       [defaultColDef]="defaultColDef"

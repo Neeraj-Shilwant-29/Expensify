@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
+@Access(AccessType.FIELD)
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "userId") 
     private Long userId;
-
+    @Column(name = "username")
     private String username;
+     @Column(name = "email")
     private String email;
+     @Column(name = "passwordHash")
     private String passwordHash;
 
     // Getters and Setters

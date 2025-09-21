@@ -4,25 +4,25 @@
     <div class="card">
       <div class="card-content">
         <h3>Total Investment</h3>
-        <p class="amount">${{totalInvestment | number:'1.2-2'}}</p>
+        <p class="amount">${{investmentSummary.totalInvestment | number:'1.2-2'}}</p>
       </div>
     </div>
     <div class="card">
       <div class="card-content">
         <h3>Total Return</h3>
-        <p class="amount">${{totalReturn | number:'1.2-2'}}</p>
+        <p class="amount">${{investmentSummary.totalReturn | number:'1.2-2'}}</p>
       </div>
     </div>
     <div class="card">
       <div class="card-content">
         <h3>Current Value</h3>
-        <p class="amount">${{totalCurrentValue | number:'1.2-2'}}</p>
+        <p class="amount">${{investmentSummary.totalCurrentValue | number:'1.2-2'}}</p>
       </div>
     </div>
     <div class="card">
       <div class="card-content">
         <h3>Total Transactions</h3>
-        <p class="amount">{{totalTransactions}}</p>
+        <p class="amount">{{investmentSummary.totalTransactions}}</p>
       </div>
     </div>
   </div>
@@ -30,11 +30,6 @@
   <!-- Filters and Add Button -->
   <div class="filters-container">
     <div class="filters">
-      <mat-form-field appearance="outline">
-        <mat-label>Search by name</mat-label>
-        <input matInput [(ngModel)]="nameFilter" (ngModelChange)="applyFilters()" placeholder="Search...">
-      </mat-form-field>
-
       <mat-form-field appearance="outline">
         <mat-label>Investment Type</mat-label>
         <mat-select [(ngModel)]="typeFilter" (ngModelChange)="applyFilters()">
@@ -63,9 +58,9 @@
   <div class="table-container">
     <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
       <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let element">{{element.name}}</td>
+      <ng-container matColumnDef="investmentId">
+        <th mat-header-cell *matHeaderCellDef>Investment Id</th>
+        <td mat-cell *matCellDef="let element">{{element.investmentId}}</td>
       </ng-container>
 
       <!-- Amount Column -->
@@ -95,7 +90,7 @@
       <!-- Date Column -->
       <ng-container matColumnDef="date">
         <th mat-header-cell *matHeaderCellDef>Date</th>
-        <td mat-cell *matCellDef="let element">{{element.date | date:'mediumDate'}}</td>
+        <td mat-cell *matCellDef="let element">{{element.createdAt | date:'mediumDate'}}</td>
       </ng-container>
 
       <!-- Actions Column -->

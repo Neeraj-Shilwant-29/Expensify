@@ -1,30 +1,36 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild, AfterViewInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Chart, registerables } from 'chart.js';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-summary',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule],
   templateUrl: './summary.component.html',
   styleUrl: './summary.component.scss'
 })
 export class SummaryComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('pieChart') pieChart!: ElementRef<HTMLCanvasElement>;
   
-  summaryData = {
-    totalIncome: 36500,
-    availableBalance: 34440,
-    totalSpent: 2060,
-    totalInvestment: 0,
-    totalSubscriptions: 0
-  };
+  summaryData :any={};
 
   private chart: Chart | null = null;
 
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    private http: HttpClient,
+    private route: ActivatedRoute
+  ) {
+    const userId = "1";
+    this.fetchSummary(userId);
+  }
 
   ngOnInit() {
+    
 
   }
 
@@ -90,6 +96,42 @@ export class SummaryComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           }
         }
+      }
+    });
+  }
+
+  private updateChartData() {
+    if (!this.chart) { return; }
+    const dataset = this.chart.data.datasets[0];
+    dataset.data = [
+      this.summaryData.totalIncome,
+      this.summaryData.totalSpent,
+      this.summaryData.totalInvestment,
+      this.summaryData.totalSubscriptions
+    ];
+    this.chart.update();
+  }
+
+  private fetchSummary(userId: string) {
+    if (!isPlatformBrowser(this.platformId)) { return; }
+
+    const params = new HttpParams().set('userId', userId);
+    this.http.get<any>(
+      `${environment.apiUrl}/summary`,
+      { params }
+    ).subscribe({
+      next: (res) => {
+        this.summaryData = {
+          totalIncome: res.totalIncome ?? 0,
+          availableBalance: res.netSavings ?? 0,
+          totalSpent: res.totalExpenses ?? 0,
+          totalInvestment: res.totalInvestments ?? 0,
+          totalSubscriptions: res.totalSubscriptions ?? 0
+        };
+        this.updateChartData();
+      },
+      error: (err) => {
+        console.error('Failed to load summary', err);
       }
     });
   }

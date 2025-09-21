@@ -6,10 +6,12 @@ import { MatTableDataSource } from '@angular/material/table';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MaterialModule } from '../../../material.module';
 import { AddInvestmentDialogComponent } from './add-investment-dialog/add-investment-dialog.component';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
 
 interface Investment {
   id: number;
-  name: string;
+  investmentId: string;
   amount: number;
   type: string;
   date: Date;
@@ -29,15 +31,10 @@ interface Investment {
   styleUrl: './investments.component.scss'
 })
 export class InvestmentsComponent implements OnInit, OnDestroy, AfterViewInit {
-  totalInvestment = 50000;
-  totalReturn = 2500;
-  totalCurrentValue = 52500;
-  totalTransactions = 1;
-
-  displayedColumns: string[] = ['name', 'amount', 'type', 'returnRate', 'currentValue', 'date', 'actions'];
+  investmentSummary:any={};
+  displayedColumns: string[] = ['investmentId', 'amount', 'type', 'returnRate', 'currentValue', 'date', 'actions'];
   dataSource!: MatTableDataSource<Investment>;
 
-  nameFilter: string = '';
   typeFilter: string = '';
   timeFilter: string = '';
 
@@ -49,23 +46,35 @@ export class InvestmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     { value: 'pastWeek', label: 'Past Week' }
   ];
 
-  constructor(private dialog: MatDialog, private snackBar: MatSnackBar, private cdr: ChangeDetectorRef) {
-    this.initializeComponent();
+  constructor(
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
+    private http: HttpClient
+  ) {
+    const userId = 1;
+    this.fetchInvestment(userId);
   }
 
-  private initializeComponent(): void {
-    // Initialize the data source with initial data
-    this.dataSource = new MatTableDataSource([
-      {
-        id: 1,
-        name: 'Tech Stocks',
-        amount: 50000,
-        type: 'Stocks',
-        date: new Date(),
-        returnRate: 5,
-        currentValue: 52500
+  private fetchInvestment(userId:any): void {
+    const params = new HttpParams().set('userId', userId);
+    this.http.get<any>(
+      `${environment.apiUrl}/investment`,
+      { params }
+    ).subscribe({
+      next: (res) => {
+        this.investmentSummary = {
+          totalInvestment: res?.totalInvestment ?? 0,
+          totalReturn: res?.totalReturn ?? 0,
+          totalCurrentValue: res?.totalCurrentValue ?? 0,
+          totalTransactions: res?.totalTransactions ?? 0
+        };
+        this.dataSource = res?.transactions;
+      },
+      error: (err) => {
+        console.error('Failed to load summary', err);
       }
-    ]);
+    });
   }
 
   ngOnInit(): void {
@@ -73,16 +82,14 @@ export class InvestmentsComponent implements OnInit, OnDestroy, AfterViewInit {
     this.dataSource.filterPredicate = (data: Investment, filter: string) => {
       if (!filter) return true; 
       const searchTerms = JSON.parse(filter);
-      const nameMatch = !searchTerms.name || data.name.toLowerCase().includes(searchTerms.name.toLowerCase());
       const typeMatch = !searchTerms.type || data.type === searchTerms.type;
       const timeMatch = this.filterByTime(data.date, searchTerms.time);
-      return nameMatch && typeMatch && timeMatch;
+      return typeMatch && timeMatch;
     };
     this.dataSource.filter = '';
   }
 
   resetFilters(): void {
-    this.nameFilter = '';
     this.typeFilter = '';
     this.timeFilter = '';
   }
@@ -93,7 +100,7 @@ export class InvestmentsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy(): void {
-    // Clean up resources if necessary
+
   }
 
   openAddInvestmentDialog(): void {
@@ -116,17 +123,16 @@ export class InvestmentsComponent implements OnInit, OnDestroy, AfterViewInit {
         this.dataSource.data = [...currentData, newInvestment];
         
         // Update totals
-        this.totalInvestment += result.amount;
-        this.totalReturn += (result.amount * result.returnRate / 100);
-        this.totalCurrentValue += newInvestment.currentValue;
-        this.totalTransactions++;
+        this.investmentSummary.totalInvestment += result.amount;
+        this.investmentSummary.totalReturn += (result.amount * result.returnRate / 100);
+        this.investmentSummary.totalCurrentValue += newInvestment.currentValue;
+        this.investmentSummary.totalTransactions++;
       }
     });
   }
 
   applyFilters(): void {
     const filterValue = {
-      name: this.nameFilter ?? '',
       type: this.typeFilter ?? '',
       time: this.timeFilter ?? ''
     };
@@ -175,7 +181,7 @@ export class InvestmentsComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   deleteInvestment(investment: Investment): void {
-    const confirmed = confirm(`Are you sure you want to delete "${investment.name}"?`);
+    const confirmed = confirm(`Are you sure you want to delete "${investment.investmentId}"?`);
     
     if (confirmed) {
       // Remove the investment from the table
@@ -217,9 +223,9 @@ export class InvestmentsComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private updateTotals(): void {
     const data = this.dataSource.data;
-    this.totalInvestment = data.reduce((sum, item) => sum + item.amount, 0);
-    this.totalReturn = data.reduce((sum, item) => sum + (item.currentValue - item.amount), 0);
-    this.totalCurrentValue = data.reduce((sum, item) => sum + item.currentValue, 0);
-    this.totalTransactions = data.length;
+    this.investmentSummary.totalInvestment = data.reduce((sum, item) => sum + item.amount, 0);
+    this.investmentSummary.totalReturn = data.reduce((sum, item) => sum + (item.currentValue - item.amount), 0);
+    this.investmentSummary.totalCurrentValue = data.reduce((sum, item) => sum + item.currentValue, 0);
+    this.investmentSummary.totalTransactions = data.length;
   }
 }
